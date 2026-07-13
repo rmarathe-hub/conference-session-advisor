@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phases 0–3 complete; Phase 4.1 Dockerfile contract confirmed/hardened.  
-**Active scope now:** Phase 4.2–4.4 (docker build/run/smoke/npx proof).
+**Current state:** Phases 0–3 complete; Phase 4.1–4.2 done (image built and container listens on 8010).  
+**Active scope now:** Phase 4.3–4.4 (container smoke + in-image npx proof).
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -90,7 +90,7 @@ This checklist matches the design contract exactly. Implement required items onl
 | ID | Requirement | Status |
 |----|-------------|--------|
 | 4.1 | Multi-stage Dockerfile based on `python:3.12-slim`; install nodejs, npm, curl in **final** runtime stage; non-root user; expose 8010; HEALTHCHECK `/healthz`; uvicorn `0.0.0.0:8010` | **Done** — Node 22 via NodeSource in final stage; non-root `appuser`; HEALTHCHECK; port 8010 |
-| 4.2 | `docker build -t conferencecatalog-mcp:test .` and `docker run -p 8010:8010 conferencecatalog-mcp:test` | Not started |
+| 4.2 | `docker build -t conferencecatalog-mcp:test .` and `docker run -p 8010:8010 conferencecatalog-mcp:test` | **Done** — image built (Node 22.23.1); container `conferencecatalog-mcp-test` healthy on `0.0.0.0:8010` |
 
 **Phase 4 Done when:** `/healthz` healthy; `match_sessions` in container returns grounded codes; npx works in final image.
 
@@ -195,4 +195,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Continue Phase 4 at **4.2** (`docker build` / `docker run`). Docker Desktop must be running.
+Continue Phase 4 at **4.3** (health + match_sessions smoke against the container). Container may already be running as `conferencecatalog-mcp-test`.
