@@ -1,0 +1,12 @@
+{
+  "sessionCode": "BRK100",
+  "title": "Agent observability deep dive",
+  "description": "Learn end to end observability for ai agents in production.",
+  "startDateTime": "2026-05-19T10:00:00Z",
+  "endDateTime": "2026-05-19T11:00:00Z",
+  "slideDeck": "https://example.com/decks/brk100.pptx",
+  "onDemand": "https://medius.microsoft.com/Embed/video-nc/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "hasOnDemand": true,
+  "captionFileLink": "https://example.com/captions/brk100.vtt",
+  "event": "build-2026"
+}

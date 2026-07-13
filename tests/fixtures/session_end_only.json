@@ -1,0 +1,8 @@
+{
+  "sessionCode": "BRK104",
+  "title": "End only schedule",
+  "description": "Has end but no start.",
+  "endDateTime": "2026-05-19T17:00:00Z",
+  "onDemand": "https://medius.microsoft.com/Embed/video-nc/aaaaaaaa-bbbb-cccc-dddd-000000000001",
+  "hasOnDemand": true
+}

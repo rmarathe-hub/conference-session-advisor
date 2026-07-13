@@ -1,0 +1,9 @@
+{
+  "sessionCode": "BRK106",
+  "title": "Caption transcript wins",
+  "description": "Has captionFileLink and transcript.",
+  "captionFileLink": "https://example.com/captions/preferred.vtt",
+  "transcript": "https://example.com/transcripts/secondary.txt",
+  "onDemand": "https://medius.microsoft.com/Embed/video-nc/aaaaaaaa-bbbb-cccc-dddd-000000000003",
+  "hasOnDemand": true
+}

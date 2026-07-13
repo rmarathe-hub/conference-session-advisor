@@ -1,0 +1,8 @@
+{
+  "sessionCode": "BRK109",
+  "title": "No transcript sources",
+  "description": "Cannot resolve transcript.",
+  "slideDeck": "https://example.com/decks/no-guid.pptx",
+  "onDemand": "https://example.com/video/no-guid",
+  "hasOnDemand": true
+}

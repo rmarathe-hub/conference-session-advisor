@@ -1,0 +1,8 @@
+{
+  "sessionCode": "BRK107",
+  "title": "Direct transcript field",
+  "description": "Uses transcript field only.",
+  "transcript": "https://example.com/transcripts/direct.txt",
+  "onDemand": "https://medius.microsoft.com/Embed/video-nc/aaaaaaaa-bbbb-cccc-dddd-000000000004",
+  "hasOnDemand": true
+}

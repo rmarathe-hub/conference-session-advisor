@@ -1,0 +1,11 @@
+{
+  "sessionCode": "BRK101",
+  "title": "Secure enterprise agents",
+  "description": "Build secure and enterprise ready agents.",
+  "startDateTime": "2026-05-19T12:00:00Z",
+  "endDateTime": "2026-05-19T13:00:00Z",
+  "slideDeck": "https://example.com/decks/brk101.pptx",
+  "onDemand": "https://medius.microsoft.com/Embed/video-nc/11111111-2222-3333-4444-555555555555",
+  "hasOnDemand": true,
+  "event": "build-2026"
+}

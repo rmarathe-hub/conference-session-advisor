@@ -1,0 +1,42 @@
+[
+  {
+    "sessionCode": "BRK100",
+    "title": "Agent observability deep dive",
+    "description": "Learn end to end observability for ai agents in production.",
+    "startDateTime": "2026-05-19T10:00:00Z",
+    "endDateTime": "2026-05-19T11:00:00Z",
+    "onDemand": "https://medius.microsoft.com/Embed/video-nc/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+    "hasOnDemand": true
+  },
+  {
+    "sessionCode": "BRK101",
+    "title": "Secure enterprise agents",
+    "description": "Build secure and enterprise ready agents.",
+    "startDateTime": "2026-05-19T12:00:00Z",
+    "endDateTime": "2026-05-19T13:00:00Z",
+    "onDemand": "https://medius.microsoft.com/Embed/video-nc/11111111-2222-3333-4444-555555555555",
+    "hasOnDemand": true
+  },
+  {
+    "sessionCode": "BRK102",
+    "title": "Live only workshop",
+    "description": "No recording available for this session.",
+    "startDateTime": "2026-05-19T14:00:00Z",
+    "endDateTime": "2026-05-19T15:00:00Z",
+    "hasOnDemand": false
+  },
+  {
+    "sessionCode": "BRK105",
+    "title": "No schedule times",
+    "description": "Missing both start and end.",
+    "onDemand": "https://medius.microsoft.com/Embed/video-nc/aaaaaaaa-bbbb-cccc-dddd-000000000002",
+    "hasOnDemand": true
+  },
+  {
+    "sessionCode": "BRK200",
+    "title": "Unrelated databases",
+    "description": "SQL tuning tips unrelated to agents.",
+    "onDemand": "https://medius.microsoft.com/Embed/video-nc/aaaaaaaa-bbbb-cccc-dddd-000000000099",
+    "hasOnDemand": true
+  }
+]

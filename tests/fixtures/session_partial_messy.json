@@ -1,0 +1,12 @@
+{
+  "sessionCode": "BRK110",
+  "title": "  Spaced Title  ",
+  "description": "<p>HTML description with <b>tags</b> and   spaces.</p>",
+  "startDateTime": "",
+  "endDateTime": null,
+  "slideDeck": "   ",
+  "onDemand": "https://medius.microsoft.com/Embed/video-nc/aaaaaaaa-bbbb-cccc-dddd-000000000005",
+  "hasOnDemand": true,
+  "transcript": null,
+  "captionFileLink": ""
+}
