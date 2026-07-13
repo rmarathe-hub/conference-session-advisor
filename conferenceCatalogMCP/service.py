@@ -12,6 +12,8 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
+from conferenceCatalogMCP.blob_cache import BlobStorageCache
+
 EVENT_SLUG = "build-2026"
 DEFAULT_CLI_TIMEOUT_SECONDS = 90
 DEFAULT_MATCH_CACHE_TTL_SECONDS = 300
@@ -57,6 +59,11 @@ class CatalogService:
 
     def __init__(self) -> None:
         self._memory = InProcessTTLCache()
+        self._blob: BlobStorageCache | None = None
+        if os.environ.get("AZURE_STORAGE_ACCOUNT_NAME") or os.environ.get(
+            "AZURE_STORAGE_CONNECTION_STRING"
+        ):
+            self._blob = BlobStorageCache()
 
     def catalog_version(self) -> str:
         """Server catalog date stamp for response envelopes."""
@@ -94,6 +101,26 @@ class CatalogService:
 
     def _detail_cache_key(self, session_code: str) -> str:
         return session_code.lower()
+
+    def _cache_get(self, key: str, ttl: float) -> Any | None:
+        """Read order: in-process → Blob → miss."""
+        memory_hit = self._memory.get(key, ttl)
+        if memory_hit is not None:
+            logger.info("Cache HIT")
+            return memory_hit
+        if self._blob is not None:
+            blob_hit = self._blob.get(key, ttl)
+            if blob_hit is not None:
+                logger.info("Cache HIT")
+                self._memory.set(key, blob_hit)
+                return blob_hit
+        return None
+
+    def _cache_set(self, key: str, payload: Any) -> None:
+        """Write order: in-process + Blob (best-effort)."""
+        self._memory.set(key, payload)
+        if self._blob is not None:
+            self._blob.set(key, payload)
 
     def _run_events_cli_json(self, args: list[str]) -> Any:
         """Run `npx -y @microsoft/events-cli <args>` and parse JSON stdout.
@@ -357,9 +384,8 @@ class CatalogService:
         cache_key = self._match_cache_key(
             signal, limit, scheduled_only, require_on_demand
         )
-        cached = self._memory.get(cache_key, self._match_cache_ttl())
+        cached = self._cache_get(cache_key, self._match_cache_ttl())
         if cached is not None:
-            logger.info("Cache HIT")
             return cached
 
         over_fetch = max(limit * 3, 10)
@@ -420,7 +446,7 @@ class CatalogService:
             "total": total,
             "catalogVersion": self.catalog_version(),
         }
-        self._memory.set(cache_key, envelope)
+        self._cache_set(cache_key, envelope)
         return envelope
 
     def get_session_by_code(self, session_code: str) -> dict[str, Any]:
@@ -430,9 +456,8 @@ class CatalogService:
         session_code = str(session_code).strip()
 
         cache_key = self._detail_cache_key(session_code)
-        cached = self._memory.get(cache_key, self._detail_cache_ttl())
+        cached = self._cache_get(cache_key, self._detail_cache_ttl())
         if cached is not None:
-            logger.info("Cache HIT")
             return cached
 
         raw = self._run_events_cli_json(
@@ -455,5 +480,5 @@ class CatalogService:
                 candidate, signal=session_code, match_score=score
             )
         }
-        self._memory.set(cache_key, envelope)
+        self._cache_set(cache_key, envelope)
         return envelope

@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phases 0–2 complete; Phase 3.1–3.2 complete (in-process TTL cache wired; BlobStorageCache implemented, not yet dual-tier wired).  
-**Active scope now:** Phase 3.3–3.5 (sanitize confirmation + Blob wiring + Cache HIT verification).
+**Current state:** Phases 0–3 complete (two-tier cache wired: in-process → Blob → CLI). Container/Azure/agent still pending.  
+**Active scope now:** Phase 4 (containerization) next when requested.
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -76,11 +76,11 @@ This checklist matches the design contract exactly. Implement required items onl
 | ID | Requirement | Status |
 |----|-------------|--------|
 | 3.1 | In-process TTL cache | **Done** — `InProcessTTLCache` wired into `match_sessions` / `get_session_by_code` |
-| 3.2 | `BlobStorageCache` in `blob_cache.py`: `get(key, ttl)`, `set(key, payload)`, `_created_at` + payload, TTL expiry delete, connection string or DefaultAzureCredential, create container, best-effort failures | **Done** (not yet wired into CatalogService; that is 3.4) |
-| 3.3 | Blob key sanitization: spaces→`_`, `(`→`{`, `)`→`}`, `:`→`-`, max length 1024 | Partial helper in `blob_cache.sanitize_blob_key`; checklist item remains until 3.3 formal pass |
-| 3.4 | Wire caches into CatalogService: read in-process → Blob → CLI; write in-process + Blob; env `MCP_CACHE_CONTAINER` (default `mcp-cache`), `MCP_MATCH_CACHE_TTL_SECONDS` (300), `MCP_DETAIL_CACHE_TTL_SECONDS` (900); match/detail key shapes as specified | Not started |
+| 3.2 | `BlobStorageCache` in `blob_cache.py`: `get(key, ttl)`, `set(key, payload)`, `_created_at` + payload, TTL expiry delete, connection string or DefaultAzureCredential, create container, best-effort failures | **Done** |
+| 3.3 | Blob key sanitization: spaces→`_`, `(`→`{`, `)`→`}`, `:`→`-`, max length 1024 | **Done** — `sanitize_blob_key` |
+| 3.4 | Wire caches into CatalogService: read in-process → Blob → CLI; write in-process + Blob; env `MCP_CACHE_CONTAINER` (default `mcp-cache`), `MCP_MATCH_CACHE_TTL_SECONDS` (300), `MCP_DETAIL_CACHE_TTL_SECONDS` (900); match/detail key shapes as specified | **Done** |
 
-**Phase 3 Done when:** Second identical signal logs `Cache HIT` and skips the events CLI.
+**Phase 3 Done when:** Second identical signal logs `Cache HIT` and skips the events CLI. **Met** (in-process; Blob when credentials present).
 
 ---
 
@@ -194,4 +194,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Continue Phase 3 at **3.3–3.4** (finalize sanitization checklist + wire Blob tier into CatalogService).
+Phase 3 complete. Proceed to **Phase 4** (containerization) when requested.

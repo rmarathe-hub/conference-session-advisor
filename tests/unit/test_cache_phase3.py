@@ -152,7 +152,88 @@ def test_blob_get_failure_is_swallowed(monkeypatch):
         ("hello world", "hello_world"),
         ("a(b)c", "a{b}c"),
         ("a:b", "a-b"),
+        ("mix (x): y", "mix_{x}-_y"),
     ],
 )
 def test_sanitize_helpers_used_by_blob(raw, expected):
     assert sanitize_blob_key(raw) == expected
+
+
+def test_sanitize_max_length_1024():
+    long_key = "a" * 2000
+    assert len(sanitize_blob_key(long_key)) == 1024
+
+
+def test_dual_tier_read_blob_then_populate_memory(monkeypatch, caplog):
+    monkeypatch.delenv("AZURE_STORAGE_CONNECTION_STRING", raising=False)
+    monkeypatch.delenv("AZURE_STORAGE_ACCOUNT_NAME", raising=False)
+    payload = {
+        "signal": "agents",
+        "results": [],
+        "total": 0,
+        "catalogVersion": "2026-01-01",
+    }
+
+    class FakeBlobCache:
+        enabled = True
+
+        def get(self, key, ttl):
+            return payload
+
+        def set(self, key, value):
+            raise AssertionError("set should not be required for this read test")
+
+    svc = CatalogService()
+    assert svc._blob is None
+    svc._blob = FakeBlobCache()  # type: ignore[assignment]
+    svc._memory.clear()
+    calls: list[list[str]] = []
+
+    def boom(args):
+        calls.append(list(args))
+        raise AssertionError("CLI should not run on blob cache hit")
+
+    monkeypatch.setattr(svc, "_run_events_cli_json", boom)
+    with caplog.at_level(logging.INFO):
+        out = svc.match_sessions("agents", limit=1)
+    assert out == payload
+    assert calls == []
+    assert any("Cache HIT" in r.message for r in caplog.records)
+    assert svc._memory.get(svc._match_cache_key("agents", 1, False, True), 300) == payload
+
+
+def test_dual_tier_write_calls_blob(monkeypatch):
+    monkeypatch.delenv("AZURE_STORAGE_CONNECTION_STRING", raising=False)
+    monkeypatch.delenv("AZURE_STORAGE_ACCOUNT_NAME", raising=False)
+    svc = CatalogService()
+    written: list[tuple[str, object]] = []
+
+    class FakeBlobCache:
+        enabled = True
+
+        def get(self, key, ttl):
+            return None
+
+        def set(self, key, value):
+            written.append((key, value))
+
+    svc._blob = FakeBlobCache()  # type: ignore[assignment]
+    search = [
+        {
+            "sessionCode": "C1",
+            "title": "agent observability",
+            "description": "agent observability",
+            "onDemand": "https://medius.microsoft.com/Embed/video-nc/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+            "hasOnDemand": True,
+        }
+    ]
+
+    def router(args):
+        if args[0] == "sessions":
+            return search
+        return search[0]
+
+    monkeypatch.setattr(svc, "_run_events_cli_json", router)
+    out = svc.match_sessions("agent observability", limit=1)
+    assert written
+    assert written[0][1] == out
