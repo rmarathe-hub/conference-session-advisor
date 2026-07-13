@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phases 0–1 complete. Docs: `PHASE_CHECKLIST.md`, `docs/PHASE_0_PREREQUISITES.md`, `docs/ARCHITECTURE.md`. No MCP server code yet.  
-**Active scope now:** Phase 2 (local MCP server). Phases 3–9 remain required for the full project.
+**Current state:** Phases 0–1 complete; Phase 2.1–2.3 complete (package scaffold, CLI wrapper, normalize/transcript/whyItMaps). Scoring, match_sessions, and full MCP JSON-RPC still pending.  
+**Active scope now:** Phase 2 (continue 2.4+). Phases 3–9 remain required for the full project.
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -53,9 +53,9 @@ This checklist matches the design contract exactly. Implement required items onl
 
 | ID | Requirement | Status |
 |----|-------------|--------|
-| 2.1 | Scaffold `conferenceCatalogMCP/` (`__init__.py`, `service.py`, `server.py`, `blob_cache.py`), root `requirements.txt` (fastapi, uvicorn, azure-storage-blob, azure-identity), root `Dockerfile` path present as required by project structure | Not started |
-| 2.2 | Implement `_run_events_cli_json(args)`: locate npx, timeout from `EVENTS_CLI_TIMEOUT_SECONDS` (default 90), parse JSON stdout, raise with stderr on non-zero exit; sole catalog access path | Not started |
-| 2.3 | Normalization contract, transcript resolution order, `whyItMaps` strength bands (High ≥ 0.75, Medium ≥ 0.50, Low &lt; 0.50); missing strings → `none` | Not started |
+| 2.1 | Scaffold `conferenceCatalogMCP/` (`__init__.py`, `service.py`, `server.py`, `blob_cache.py`), root `requirements.txt` (fastapi, uvicorn, azure-storage-blob, azure-identity), root `Dockerfile` path present as required by project structure | **Done** |
+| 2.2 | Implement `_run_events_cli_json(args)`: locate npx, timeout from `EVENTS_CLI_TIMEOUT_SECONDS` (default 90), parse JSON stdout, raise with stderr on non-zero exit; sole catalog access path | **Done** |
+| 2.3 | Normalization contract, transcript resolution order, `whyItMaps` strength bands (High ≥ 0.75, Medium ≥ 0.50, Low &lt; 0.50); missing strings → `none` | **Done** |
 | 2.4 | `_score_from_cli_candidate` with formula: `min(1.0, 0.60*overlap + 0.20*exact_phrase + 0.15*title_token_overlap + 0.05*transcript_exists)` | Not started |
 | 2.5 | `match_sessions(signal, limit=3, scheduled_only=False, require_on_demand=True)`: validation, over-fetch `max(limit*3, 10)`, filters, score/sort, shortlist, hydrate shortlist only, return `{signal, results, total, catalogVersion}` | Not started |
 | 2.6 | `get_session_by_code(session_code)`: validation, CLI session lookup, normalize, `{session}`, raise `KeyError` if missing | Not started |
@@ -194,4 +194,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Phases 0–1 complete. Proceed to **Phase 2** (2.1 scaffold MCP package).
+Continue Phase 2 at **2.4** (scoring formula), then 2.5–2.9.
