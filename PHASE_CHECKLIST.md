@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phases 0–2 complete locally (MCP server: CatalogService + JSON-RPC `/mcp` + REST `/tools/*` + smoke). Cache, container, Azure, and agent still pending (Phases 3–9).  
-**Active scope now:** Phase 3 (two-tier cache) next when requested.
+**Current state:** Phases 0–2 complete; Phase 3.1–3.2 complete (in-process TTL cache wired; BlobStorageCache implemented, not yet dual-tier wired).  
+**Active scope now:** Phase 3.3–3.5 (sanitize confirmation + Blob wiring + Cache HIT verification).
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -75,9 +75,9 @@ This checklist matches the design contract exactly. Implement required items onl
 
 | ID | Requirement | Status |
 |----|-------------|--------|
-| 3.1 | In-process TTL cache | Not started |
-| 3.2 | `BlobStorageCache` in `blob_cache.py`: `get(key, ttl)`, `set(key, payload)`, `_created_at` + payload, TTL expiry delete, connection string or DefaultAzureCredential, create container, best-effort failures | Not started |
-| 3.3 | Blob key sanitization: spaces→`_`, `(`→`{`, `)`→`}`, `:`→`-`, max length 1024 | Not started |
+| 3.1 | In-process TTL cache | **Done** — `InProcessTTLCache` wired into `match_sessions` / `get_session_by_code` |
+| 3.2 | `BlobStorageCache` in `blob_cache.py`: `get(key, ttl)`, `set(key, payload)`, `_created_at` + payload, TTL expiry delete, connection string or DefaultAzureCredential, create container, best-effort failures | **Done** (not yet wired into CatalogService; that is 3.4) |
+| 3.3 | Blob key sanitization: spaces→`_`, `(`→`{`, `)`→`}`, `:`→`-`, max length 1024 | Partial helper in `blob_cache.sanitize_blob_key`; checklist item remains until 3.3 formal pass |
 | 3.4 | Wire caches into CatalogService: read in-process → Blob → CLI; write in-process + Blob; env `MCP_CACHE_CONTAINER` (default `mcp-cache`), `MCP_MATCH_CACHE_TTL_SECONDS` (300), `MCP_DETAIL_CACHE_TTL_SECONDS` (900); match/detail key shapes as specified | Not started |
 
 **Phase 3 Done when:** Second identical signal logs `Cache HIT` and skips the events CLI.
@@ -194,4 +194,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Phase 2 complete. Proceed to **Phase 3** (two-tier cache) when requested.
+Continue Phase 3 at **3.3–3.4** (finalize sanitization checklist + wire Blob tier into CatalogService).

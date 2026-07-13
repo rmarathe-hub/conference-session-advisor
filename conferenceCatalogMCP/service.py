@@ -3,32 +3,97 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import shutil
 import subprocess
+import time
 from datetime import datetime, timezone
 from typing import Any
 
 EVENT_SLUG = "build-2026"
 DEFAULT_CLI_TIMEOUT_SECONDS = 90
+DEFAULT_MATCH_CACHE_TTL_SECONDS = 300
+DEFAULT_DETAIL_CACHE_TTL_SECONDS = 900
 
 _GUID_RE = re.compile(
     r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 )
 _TOKEN_RE = re.compile(r"[a-z0-9]+")
 
+logger = logging.getLogger(__name__)
+
 
 class EventsCliError(RuntimeError):
     """Raised when the events CLI cannot be run or returns a failure."""
 
 
+class InProcessTTLCache:
+    """In-process TTL cache storing {_created_at, payload} entries."""
+
+    def __init__(self) -> None:
+        self._store: dict[str, dict[str, Any]] = {}
+
+    def get(self, key: str, ttl: float) -> Any | None:
+        entry = self._store.get(key)
+        if entry is None:
+            return None
+        created_at = float(entry.get("_created_at", 0))
+        if time.time() - created_at > float(ttl):
+            self._store.pop(key, None)
+            return None
+        return entry.get("payload")
+
+    def set(self, key: str, payload: Any) -> None:
+        self._store[key] = {"_created_at": time.time(), "payload": payload}
+
+    def clear(self) -> None:
+        self._store.clear()
+
+
 class CatalogService:
     """Grounded session matching against Microsoft Build via events-cli."""
+
+    def __init__(self) -> None:
+        self._memory = InProcessTTLCache()
 
     def catalog_version(self) -> str:
         """Server catalog date stamp for response envelopes."""
         return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    def _match_cache_ttl(self) -> int:
+        return int(
+            os.environ.get(
+                "MCP_MATCH_CACHE_TTL_SECONDS", DEFAULT_MATCH_CACHE_TTL_SECONDS
+            )
+        )
+
+    def _detail_cache_ttl(self) -> int:
+        return int(
+            os.environ.get(
+                "MCP_DETAIL_CACHE_TTL_SECONDS", DEFAULT_DETAIL_CACHE_TTL_SECONDS
+            )
+        )
+
+    def _match_cache_key(
+        self,
+        signal: str,
+        limit: int,
+        scheduled_only: bool,
+        require_on_demand: bool,
+    ) -> str:
+        return str(
+            (
+                signal.lower(),
+                limit,
+                scheduled_only,
+                require_on_demand,
+            )
+        )
+
+    def _detail_cache_key(self, session_code: str) -> str:
+        return session_code.lower()
 
     def _run_events_cli_json(self, args: list[str]) -> Any:
         """Run `npx -y @microsoft/events-cli <args>` and parse JSON stdout.
@@ -289,6 +354,14 @@ class CatalogService:
         if not isinstance(limit, int) or isinstance(limit, bool) or not (1 <= limit <= 10):
             raise ValueError("limit must be an integer satisfying 1 <= limit <= 10")
 
+        cache_key = self._match_cache_key(
+            signal, limit, scheduled_only, require_on_demand
+        )
+        cached = self._memory.get(cache_key, self._match_cache_ttl())
+        if cached is not None:
+            logger.info("Cache HIT")
+            return cached
+
         over_fetch = max(limit * 3, 10)
         raw = self._run_events_cli_json(
             [
@@ -341,18 +414,26 @@ class CatalogService:
 
         results.sort(key=lambda session: session["matchScore"], reverse=True)
 
-        return {
+        envelope = {
             "signal": signal,
             "results": results,
             "total": total,
             "catalogVersion": self.catalog_version(),
         }
+        self._memory.set(cache_key, envelope)
+        return envelope
 
     def get_session_by_code(self, session_code: str) -> dict[str, Any]:
         """Return one normalized session by authoritative code."""
         if session_code is None or not str(session_code).strip():
             raise ValueError("session_code must be a non-empty string")
         session_code = str(session_code).strip()
+
+        cache_key = self._detail_cache_key(session_code)
+        cached = self._memory.get(cache_key, self._detail_cache_ttl())
+        if cached is not None:
+            logger.info("Cache HIT")
+            return cached
 
         raw = self._run_events_cli_json(
             ["session", session_code, "--event", EVENT_SLUG, "--json"]
@@ -369,8 +450,10 @@ class CatalogService:
             raise KeyError(session_code)
 
         score = self._score_from_cli_candidate(session_code, candidate)
-        return {
+        envelope = {
             "session": self._normalize_session(
                 candidate, signal=session_code, match_score=score
             )
         }
+        self._memory.set(cache_key, envelope)
+        return envelope
