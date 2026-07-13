@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phases 0–5 **COMPLETE**; Phase 6A–6B done (`app-package/manifest.json`, `declarativeAgent.json`). Plugin, tools JSON, and icons still pending.  
-**Active scope now:** Phase 6C–6E (plugin, tools schemas, icons).
+**Current state:** Phases 0–5 **COMPLETE**; Phase 6A–6D done (manifest, declarativeAgent, plugin, tools). Icons still pending (6E).  
+**Active scope now:** Phase 6E (color.png / outline.png), then Toolkit validate.
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -123,8 +123,8 @@ This checklist matches the design contract exactly. Implement required items onl
 |----|-------------|--------|
 | 6.1 | `manifest.json` (manifestVersion 1.29, GUID, name, accentColor, icons, declarativeAgents → `declarativeAgent.json`) | **Done** — `app-package/manifest.json` (icons files still Phase 6E) |
 | 6.2 | `declarativeAgent.json` (schema v1.7): full workflow instructions, capabilities Email/TeamsMessages/Meetings/OneDriveAndSharePoint/People, four conversation starters, one action → `conferenceCatalogPlugin.json` | **Done** — `app-package/declarativeAgent.json` (plugin file arrives in 6C) |
-| 6.3 | `conferenceCatalogPlugin.json` (schema v2.4, namespace ConferenceCatalog, grounding text, RemoteMCPServer, auth.type None, spec.url deployed `/mcp`, tools file, run_for_functions) | Not started |
-| 6.4 | `conferenceCatalogTools.json` with full input schemas (match_sessions: signal, limit, scheduledOnly, requireOnDemand; get_session_by_code: sessionCode) | Not started |
+| 6.3 | `conferenceCatalogPlugin.json` (schema v2.4, namespace ConferenceCatalog, grounding text, RemoteMCPServer, auth.type None, spec.url deployed `/mcp`, tools file, run_for_functions) | **Done** — `app-package/conferenceCatalogPlugin.json` → live `/mcp` |
+| 6.4 | `conferenceCatalogTools.json` with full input schemas (match_sessions: signal, limit, scheduledOnly, requireOnDemand; get_session_by_code: sessionCode) | **Done** — aligned with server `tools/list` |
 | 6.5 | `color.png` 192×192 and `outline.png` 32×32 | Not started |
 
 **Phase 6 Done when:** All four JSON files validate in Agents Toolkit; `spec.url` points at live deployed `/mcp`.
@@ -197,4 +197,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Continue Phase 6 at **6C–6E** (plugin + tools JSON + icons). Toolkit validate after all four JSON files + icons exist.
+Continue Phase 6 at **6E** (icons), then validate the four JSON files in Agents Toolkit.

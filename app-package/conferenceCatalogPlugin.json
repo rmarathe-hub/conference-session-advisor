@@ -1,0 +1,77 @@
+{
+  "schema_version": "v2.4",
+  "name_for_human": "Conference Catalog",
+  "description_for_human": "Maps priorities to grounded Microsoft Build sessions.",
+  "description_for_model": "Use this plugin to map enterprise signals to grounded Microsoft Build 2026 sessions. Call match_sessions for each normalized signal and get_session_by_code when looking up a specific session code. Do not invent sessions outside tool results. Compose agendas only from returned metadata. When a result set is empty, say there is no grounded match and do not guess.",
+  "namespace": "ConferenceCatalog",
+  "functions": [
+    {
+      "name": "match_sessions",
+      "description": "Match a customer or priority signal to grounded Microsoft Build 2026 sessions. Returns up to limit on-demand sessions by default, strongest first.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "signal": {
+            "type": "string",
+            "description": "Atomic priority, challenge, initiative, or pain point."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum sessions to return (1-10). Default 3."
+          }
+        },
+        "required": ["signal"]
+      },
+      "states": {
+        "responding": {
+          "instructions": [
+            "Use only metadata returned by match_sessions.",
+            "When the returned result set is empty, say there is no grounded match.",
+            "Do not guess or invent sessions, codes, titles, or links."
+          ]
+        }
+      }
+    },
+    {
+      "name": "get_session_by_code",
+      "description": "Return full normalized metadata for one Build 2026 session code from the authoritative catalog.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "sessionCode": {
+            "type": "string",
+            "description": "Authoritative Microsoft Build session code."
+          }
+        },
+        "required": ["sessionCode"]
+      },
+      "states": {
+        "responding": {
+          "instructions": [
+            "Use only metadata returned by get_session_by_code.",
+            "If the session is not found, give a clean not-found response.",
+            "Do not invent session details."
+          ]
+        }
+      }
+    }
+  ],
+  "runtimes": [
+    {
+      "type": "RemoteMCPServer",
+      "auth": {
+        "type": "None"
+      },
+      "spec": {
+        "url": "https://rmarathe-conf-advisor-7672.azurewebsites.net/mcp",
+        "mcp_tool_description": {
+          "file": "conferenceCatalogTools.json"
+        }
+      },
+      "run_for_functions": [
+        "match_sessions",
+        "get_session_by_code"
+      ]
+    }
+  ]
+}

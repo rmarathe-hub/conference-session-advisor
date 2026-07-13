@@ -1,0 +1,51 @@
+{
+  "tools": [
+    {
+      "name": "match_sessions",
+      "description": "Match a customer or priority signal to grounded Microsoft Build 2026 sessions. Returns up to `limit` on-demand sessions by default, strongest first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "signal": {
+            "type": "string",
+            "description": "Atomic priority, challenge, initiative, or pain point."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "default": 3,
+            "description": "Maximum sessions to return (1-10)."
+          },
+          "scheduledOnly": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, keep only sessions with schedule times."
+          },
+          "requireOnDemand": {
+            "type": "boolean",
+            "default": true,
+            "description": "When true, keep only sessions with on-demand recordings."
+          }
+        },
+        "required": ["signal"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_session_by_code",
+      "description": "Return full normalized metadata for one Build 2026 session code from the authoritative events-cli catalog.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sessionCode": {
+            "type": "string",
+            "description": "Authoritative Microsoft Build session code."
+          }
+        },
+        "required": ["sessionCode"],
+        "additionalProperties": false
+      }
+    }
+  ]
+}
