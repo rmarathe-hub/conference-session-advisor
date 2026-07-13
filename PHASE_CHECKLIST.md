@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phases 0–5 **COMPLETE** (local MCP, cache, Docker, Azure deploy verified, docs, pytest green).  
-**Active scope now:** Phase 6 (declarative agent JSON + icons).
+**Current state:** Phases 0–5 **COMPLETE**; Phase 6A–6B done (`app-package/manifest.json`, `declarativeAgent.json`). Plugin, tools JSON, and icons still pending.  
+**Active scope now:** Phase 6C–6E (plugin, tools schemas, icons).
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -121,8 +121,8 @@ This checklist matches the design contract exactly. Implement required items onl
 
 | ID | Requirement | Status |
 |----|-------------|--------|
-| 6.1 | `manifest.json` (manifestVersion 1.29, GUID, name, accentColor, icons, declarativeAgents → `declarativeAgent.json`) | Not started |
-| 6.2 | `declarativeAgent.json` (schema v1.7): full workflow instructions, capabilities Email/TeamsMessages/Meetings/OneDriveAndSharePoint/People, four conversation starters, one action → `conferenceCatalogPlugin.json` | Not started |
+| 6.1 | `manifest.json` (manifestVersion 1.29, GUID, name, accentColor, icons, declarativeAgents → `declarativeAgent.json`) | **Done** — `app-package/manifest.json` (icons files still Phase 6E) |
+| 6.2 | `declarativeAgent.json` (schema v1.7): full workflow instructions, capabilities Email/TeamsMessages/Meetings/OneDriveAndSharePoint/People, four conversation starters, one action → `conferenceCatalogPlugin.json` | **Done** — `app-package/declarativeAgent.json` (plugin file arrives in 6C) |
 | 6.3 | `conferenceCatalogPlugin.json` (schema v2.4, namespace ConferenceCatalog, grounding text, RemoteMCPServer, auth.type None, spec.url deployed `/mcp`, tools file, run_for_functions) | Not started |
 | 6.4 | `conferenceCatalogTools.json` with full input schemas (match_sessions: signal, limit, scheduledOnly, requireOnDemand; get_session_by_code: sessionCode) | Not started |
 | 6.5 | `color.png` 192×192 and `outline.png` 32×32 | Not started |
@@ -197,4 +197,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Phase 5 complete. Proceed to **Phase 6** (declarative agent package: manifest, declarativeAgent, plugin, tools, icons) when ready.
+Continue Phase 6 at **6C–6E** (plugin + tools JSON + icons). Toolkit validate after all four JSON files + icons exist.

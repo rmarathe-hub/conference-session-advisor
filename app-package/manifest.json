@@ -1,0 +1,33 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.29/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.29",
+  "version": "1.0.0",
+  "id": "70dc4d0e-da0f-46c0-a477-3b8790338664",
+  "developer": {
+    "name": "Conference Session Advisor",
+    "websiteUrl": "https://github.com/rmarathe-hub/conference-session-advisor",
+    "privacyUrl": "https://github.com/rmarathe-hub/conference-session-advisor",
+    "termsOfUseUrl": "https://github.com/rmarathe-hub/conference-session-advisor"
+  },
+  "name": {
+    "short": "Conf Session Advisor",
+    "full": "Conference Session Advisor"
+  },
+  "description": {
+    "short": "Maps Microsoft 365 priorities to grounded Microsoft Build sessions.",
+    "full": "Builds a practical agenda from priorities found in Microsoft 365 context and maps those priorities to grounded Microsoft Build sessions via the Conference Catalog MCP server."
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "#0F6CBD",
+  "copilotAgents": {
+    "declarativeAgents": [
+      {
+        "id": "conferenceSessionAdvisor",
+        "file": "declarativeAgent.json"
+      }
+    ]
+  }
+}
