@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phases 0–3 complete; Phase 4.1–4.2 done (image built and container listens on 8010).  
-**Active scope now:** Phase 4.3–4.4 (container smoke + in-image npx proof).
+**Current state:** Phases 0–5 **COMPLETE** (local MCP, cache, Docker, Azure deploy verified, docs, pytest green).  
+**Active scope now:** Phase 6 (declarative agent JSON + icons).
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -91,8 +91,10 @@ This checklist matches the design contract exactly. Implement required items onl
 |----|-------------|--------|
 | 4.1 | Multi-stage Dockerfile based on `python:3.12-slim`; install nodejs, npm, curl in **final** runtime stage; non-root user; expose 8010; HEALTHCHECK `/healthz`; uvicorn `0.0.0.0:8010` | **Done** — Node 22 via NodeSource in final stage; non-root `appuser`; HEALTHCHECK; port 8010 |
 | 4.2 | `docker build -t conferencecatalog-mcp:test .` and `docker run -p 8010:8010 conferencecatalog-mcp:test` | **Done** — image built (Node 22.23.1); container `conferencecatalog-mcp-test` healthy on `0.0.0.0:8010` |
+| 4.3 | Smoke from host: `GET /healthz`; `POST /mcp` `match_sessions` returns grounded codes | **Done** — healthz ok; BRK252/ODSP933/DEM361 grounded via CLI |
+| 4.4 | Prove npx works inside the running image | **Done** — as `appuser`: npx 10.9.8, Node 22.23.1; `events-cli status` + `sessions` JSON OK |
 
-**Phase 4 Done when:** `/healthz` healthy; `match_sessions` in container returns grounded codes; npx works in final image.
+**Phase 4 Done when:** `/healthz` healthy; `match_sessions` in container returns grounded codes; npx works in final image. **Met.**
 
 ---
 
@@ -100,18 +102,18 @@ This checklist matches the design contract exactly. Implement required items onl
 
 | ID | Requirement | Status |
 |----|-------------|--------|
-| 5.1 | Resource group | Not started |
-| 5.2 | ACR create + `az acr build` image `conferencecatalog-mcp:latest` + show-tags | Not started |
-| 5.3 | Linux App Service plan B1 + web app custom container | Not started |
-| 5.4 | Managed identity `$principalId` (not `$pid`), AcrPull, WEBSITES_PORT=8010 | Not started |
-| 5.5 | Storage account + blob container `mcp-cache` | Not started |
-| 5.6 | Storage Blob Data Contributor on web app identity | Not started |
-| 5.7 | App settings: `AZURE_STORAGE_ACCOUNT_NAME`, `MCP_CACHE_CONTAINER`, `WEBSITES_PORT` | Not started |
-| 5.8 | Restart; verify public `/healthz`; document log tail + Kudu | Not started |
-| 5.9 | Document security callout: `auth.type = None` is PoC only; real use needs API-key or OAuth (do not implement auth in base project) | Not started |
+| 5.1 | Resource group | **Done** — `rg-conference-session-advisor` (westus2); user provisioned, agent verified |
+| 5.2 | ACR create + `az acr build` image `conferencecatalog-mcp:latest` + show-tags | **Done** — `rmaratheconfacr7672` / `conferencecatalog-mcp:latest` |
+| 5.3 | Linux App Service plan B1 + web app custom container | **Done** — `asp-conference-session-advisor` / `rmarathe-conf-advisor-7672` |
+| 5.4 | Managed identity `$principalId` (not `$pid`), AcrPull, WEBSITES_PORT=8010 | **Done** — SystemAssigned; AcrPull; setting name present |
+| 5.5 | Storage account + blob container `mcp-cache` | **Done** — `rmarathecache7672` / `mcp-cache` |
+| 5.6 | Storage Blob Data Contributor on web app identity | **Done** — role name verified on storage scope |
+| 5.7 | App settings: `AZURE_STORAGE_ACCOUNT_NAME`, `MCP_CACHE_CONTAINER`, `WEBSITES_PORT` | **Done** — required setting **names** verified (plus TTLs / CLI timeout) |
+| 5.8 | Restart; verify public `/healthz`; document log tail + Kudu | **Done** — see `docs/DEPLOYMENT.md` |
+| 5.9 | Document security callout: `auth.type = None` is PoC only; real use needs API-key or OAuth (do not implement auth in base project) | **Done** — documented; auth not implemented |
 
 **Phase 5 Done when:** Public `/healthz` ok; repeated signal Cache HIT; managed identity, ACR pull, Blob RBAC work.  
-**Note:** Placeholder resource names until user supplies them; do not claim success unless actually performed.
+**Status: COMPLETE** — `/healthz` ok; MI + AcrPull + Storage Blob Data Contributor verified; cold→warm live `match_sessions` (~9.8s → ~0.11s, OD812) + Blob cache entries as Cache HIT evidence (literal App Service log line not observed; see `docs/DEPLOYMENT.md`); local pytest **173 passed** (`not real_cli`, ~97% cover).
 
 ---
 
@@ -195,4 +197,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Continue Phase 4 at **4.3** (health + match_sessions smoke against the container). Container may already be running as `conferencecatalog-mcp-test`.
+Phase 5 complete. Proceed to **Phase 6** (declarative agent package: manifest, declarativeAgent, plugin, tools, icons) when ready.
