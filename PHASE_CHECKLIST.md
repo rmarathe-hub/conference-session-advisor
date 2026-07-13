@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phase 0 complete. Docs: `PHASE_CHECKLIST.md`, `docs/PHASE_0_PREREQUISITES.md`. No MCP server code yet.  
-**Active scope now:** Phases 0–2 (local MCP foundation). Phases 3–9 remain required for the full project.
+**Current state:** Phases 0–1 complete. Docs: `PHASE_CHECKLIST.md`, `docs/PHASE_0_PREREQUISITES.md`, `docs/ARCHITECTURE.md`. No MCP server code yet.  
+**Active scope now:** Phase 2 (local MCP server). Phases 3–9 remain required for the full project.
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -41,11 +41,11 @@ This checklist matches the design contract exactly. Implement required items onl
 
 | ID | Requirement | Status |
 |----|-------------|--------|
-| 1.1 | Document Component A: Microsoft 365 declarative agent (JSON configuration only) | Not started |
-| 1.2 | Document Component B: Python/FastAPI MCP server returning grounded Build sessions | Not started |
-| 1.3 | Lock order: build B before A; B independently testable; A is thin config pointing at deployed MCP URL | Not started |
+| 1.1 | Document Component A: Microsoft 365 declarative agent (JSON configuration only) | **Done** — `docs/ARCHITECTURE.md` |
+| 1.2 | Document Component B: Python/FastAPI MCP server returning grounded Build sessions | **Done** — `docs/ARCHITECTURE.md` |
+| 1.3 | Lock order: build B before A; B independently testable; A is thin config pointing at deployed MCP URL | **Done** — `docs/ARCHITECTURE.md` |
 
-**Phase 1 Done when:** Architecture is clear and B is the next implementation target.
+**Phase 1 Done when:** Architecture is clear and B is the next implementation target. **Met.**
 
 ---
 
@@ -194,4 +194,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Phase 0 complete. Proceed to **Phase 1** (1.1–1.3 two-deliverable model documentation).
+Phases 0–1 complete. Proceed to **Phase 2** (2.1 scaffold MCP package).
