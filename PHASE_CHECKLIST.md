@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phases 0–1 complete; Phase 2.1–2.6 complete (scaffold, CLI, normalize, scoring, match_sessions, get_session_by_code). FastAPI MCP JSON-RPC and smoke still pending (2.7–2.9).  
-**Active scope now:** Phase 2 (continue 2.7+). Phases 3–9 remain required for the full project.
+**Current state:** Phases 0–2 complete locally (MCP server: CatalogService + JSON-RPC `/mcp` + REST `/tools/*` + smoke). Cache, container, Azure, and agent still pending (Phases 3–9).  
+**Active scope now:** Phase 3 (two-tier cache) next when requested.
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -59,15 +59,15 @@ This checklist matches the design contract exactly. Implement required items onl
 | 2.4 | `_score_from_cli_candidate` with formula: `min(1.0, 0.60*overlap + 0.20*exact_phrase + 0.15*title_token_overlap + 0.05*transcript_exists)` | **Done** |
 | 2.5 | `match_sessions(signal, limit=3, scheduled_only=False, require_on_demand=True)`: validation, over-fetch `max(limit*3, 10)`, filters, score/sort, shortlist, hydrate shortlist only, return `{signal, results, total, catalogVersion}` | **Done** |
 | 2.6 | `get_session_by_code(session_code)`: validation, CLI session lookup, normalize, `{session}`, raise `KeyError` if missing | **Done** |
-| 2.7 | FastAPI: `GET /healthz` → `{status: ok}`; `POST /mcp` JSON-RPC: `initialize` (protocolVersion `2024-11-05`, serverInfo.name `conference-catalog-mcp`), `notifications/initialized`, `tools/list` (exactly `match_sessions`, `get_session_by_code`), `tools/call` with `content` + `structuredContent` | Not started |
-| 2.8 | JSON-RPC errors `-32601`, `-32602`, `-32001`, `-32603`; REST `POST /tools/list`, `POST /tools/call` with `NOT_FOUND`, `INVALID_ARGUMENT`, `INTERNAL` | Not started |
-| 2.9 | Local smoke: `python -m uvicorn conferenceCatalogMCP.server:app --host 127.0.0.1 --port 8010`; verify initialize, tools/list, `match_sessions` with signal `agent observability` limit 3; confirm codes via events-cli | Not started |
+| 2.7 | FastAPI: `GET /healthz` → `{status: ok}`; `POST /mcp` JSON-RPC: `initialize` (protocolVersion `2024-11-05`, serverInfo.name `conference-catalog-mcp`), `notifications/initialized`, `tools/list` (exactly `match_sessions`, `get_session_by_code`), `tools/call` with `content` + `structuredContent` | **Done** |
+| 2.8 | JSON-RPC errors `-32601`, `-32602`, `-32001`, `-32603`; REST `POST /tools/list`, `POST /tools/call` with `NOT_FOUND`, `INVALID_ARGUMENT`, `INTERNAL` | **Done** |
+| 2.9 | Local smoke: `python -m uvicorn conferenceCatalogMCP.server:app --host 127.0.0.1 --port 8010`; verify initialize, tools/list, `match_sessions` with signal `agent observability` limit 3; confirm codes via events-cli | **Done** |
 
 **Phase 2 Done when:**
-- [ ] `initialize` returns `serverInfo.name = conference-catalog-mcp`
-- [ ] `tools/list` returns exactly `match_sessions` and `get_session_by_code`
-- [ ] `match_sessions` for `agent observability` returns at most 3 results with `sessionCode`, `recording`, `matchScore`, `whyItMaps`
-- [ ] Every returned code confirmable via `npx -y @microsoft/events-cli session <code> --event build-2026 --json`
+- [x] `initialize` returns `serverInfo.name = conference-catalog-mcp`
+- [x] `tools/list` returns exactly `match_sessions` and `get_session_by_code`
+- [x] `match_sessions` for `agent observability` returns at most 3 results with `sessionCode`, `recording`, `matchScore`, `whyItMaps`
+- [x] Every returned code confirmable via `npx -y @microsoft/events-cli session <code> --event build-2026 --json`
 
 ---
 
@@ -194,4 +194,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Continue Phase 2 at **2.7** (FastAPI MCP JSON-RPC), then 2.8–2.9.
+Phase 2 complete. Proceed to **Phase 3** (two-tier cache) when requested.
