@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phases 0–3 complete (two-tier cache wired: in-process → Blob → CLI). Container/Azure/agent still pending.  
-**Active scope now:** Phase 4 (containerization) next when requested.
+**Current state:** Phases 0–3 complete; Phase 4.1 Dockerfile contract confirmed/hardened.  
+**Active scope now:** Phase 4.2–4.4 (docker build/run/smoke/npx proof).
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -79,8 +79,9 @@ This checklist matches the design contract exactly. Implement required items onl
 | 3.2 | `BlobStorageCache` in `blob_cache.py`: `get(key, ttl)`, `set(key, payload)`, `_created_at` + payload, TTL expiry delete, connection string or DefaultAzureCredential, create container, best-effort failures | **Done** |
 | 3.3 | Blob key sanitization: spaces→`_`, `(`→`{`, `)`→`}`, `:`→`-`, max length 1024 | **Done** — `sanitize_blob_key` |
 | 3.4 | Wire caches into CatalogService: read in-process → Blob → CLI; write in-process + Blob; env `MCP_CACHE_CONTAINER` (default `mcp-cache`), `MCP_MATCH_CACHE_TTL_SECONDS` (300), `MCP_DETAIL_CACHE_TTL_SECONDS` (900); match/detail key shapes as specified | **Done** |
+| 3.5 | Verify Done when: identical signal twice locally; log `Cache HIT`; no CLI on 2nd call | **Done** — signal `agent observability`; 1st call 2 CLI invokes; 2nd call 0 added; `Cache HIT` logged; envelopes equal |
 
-**Phase 3 Done when:** Second identical signal logs `Cache HIT` and skips the events CLI. **Met** (in-process; Blob when credentials present).
+**Phase 3 Done when:** Second identical signal logs `Cache HIT` and skips the events CLI. **Met** (verified 3.5 with live CLI + in-process cache; Blob optional).
 
 ---
 
@@ -88,7 +89,7 @@ This checklist matches the design contract exactly. Implement required items onl
 
 | ID | Requirement | Status |
 |----|-------------|--------|
-| 4.1 | Multi-stage Dockerfile based on `python:3.12-slim`; install nodejs, npm, curl in **final** runtime stage; non-root user; expose 8010; HEALTHCHECK `/healthz`; uvicorn `0.0.0.0:8010` | Not started |
+| 4.1 | Multi-stage Dockerfile based on `python:3.12-slim`; install nodejs, npm, curl in **final** runtime stage; non-root user; expose 8010; HEALTHCHECK `/healthz`; uvicorn `0.0.0.0:8010` | **Done** — Node 22 via NodeSource in final stage; non-root `appuser`; HEALTHCHECK; port 8010 |
 | 4.2 | `docker build -t conferencecatalog-mcp:test .` and `docker run -p 8010:8010 conferencecatalog-mcp:test` | Not started |
 
 **Phase 4 Done when:** `/healthz` healthy; `match_sessions` in container returns grounded codes; npx works in final image.
@@ -194,4 +195,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Phase 3 complete. Proceed to **Phase 4** (containerization) when requested.
+Continue Phase 4 at **4.2** (`docker build` / `docker run`). Docker Desktop must be running.
