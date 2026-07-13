@@ -3,8 +3,8 @@
 This checklist matches the design contract exactly. Implement required items only; do not add features outside the contract.
 
 **Repository inspected:** 2026-07-12  
-**Current state:** Phases 0–1 complete; Phase 2.1–2.3 complete (package scaffold, CLI wrapper, normalize/transcript/whyItMaps). Scoring, match_sessions, and full MCP JSON-RPC still pending.  
-**Active scope now:** Phase 2 (continue 2.4+). Phases 3–9 remain required for the full project.
+**Current state:** Phases 0–1 complete; Phase 2.1–2.6 complete (scaffold, CLI, normalize, scoring, match_sessions, get_session_by_code). FastAPI MCP JSON-RPC and smoke still pending (2.7–2.9).  
+**Active scope now:** Phase 2 (continue 2.7+). Phases 3–9 remain required for the full project.
 
 **Out of scope for the base project (do not implement):**
 - Extra product features, embedding search, vector databases
@@ -56,9 +56,9 @@ This checklist matches the design contract exactly. Implement required items onl
 | 2.1 | Scaffold `conferenceCatalogMCP/` (`__init__.py`, `service.py`, `server.py`, `blob_cache.py`), root `requirements.txt` (fastapi, uvicorn, azure-storage-blob, azure-identity), root `Dockerfile` path present as required by project structure | **Done** |
 | 2.2 | Implement `_run_events_cli_json(args)`: locate npx, timeout from `EVENTS_CLI_TIMEOUT_SECONDS` (default 90), parse JSON stdout, raise with stderr on non-zero exit; sole catalog access path | **Done** |
 | 2.3 | Normalization contract, transcript resolution order, `whyItMaps` strength bands (High ≥ 0.75, Medium ≥ 0.50, Low &lt; 0.50); missing strings → `none` | **Done** |
-| 2.4 | `_score_from_cli_candidate` with formula: `min(1.0, 0.60*overlap + 0.20*exact_phrase + 0.15*title_token_overlap + 0.05*transcript_exists)` | Not started |
-| 2.5 | `match_sessions(signal, limit=3, scheduled_only=False, require_on_demand=True)`: validation, over-fetch `max(limit*3, 10)`, filters, score/sort, shortlist, hydrate shortlist only, return `{signal, results, total, catalogVersion}` | Not started |
-| 2.6 | `get_session_by_code(session_code)`: validation, CLI session lookup, normalize, `{session}`, raise `KeyError` if missing | Not started |
+| 2.4 | `_score_from_cli_candidate` with formula: `min(1.0, 0.60*overlap + 0.20*exact_phrase + 0.15*title_token_overlap + 0.05*transcript_exists)` | **Done** |
+| 2.5 | `match_sessions(signal, limit=3, scheduled_only=False, require_on_demand=True)`: validation, over-fetch `max(limit*3, 10)`, filters, score/sort, shortlist, hydrate shortlist only, return `{signal, results, total, catalogVersion}` | **Done** |
+| 2.6 | `get_session_by_code(session_code)`: validation, CLI session lookup, normalize, `{session}`, raise `KeyError` if missing | **Done** |
 | 2.7 | FastAPI: `GET /healthz` → `{status: ok}`; `POST /mcp` JSON-RPC: `initialize` (protocolVersion `2024-11-05`, serverInfo.name `conference-catalog-mcp`), `notifications/initialized`, `tools/list` (exactly `match_sessions`, `get_session_by_code`), `tools/call` with `content` + `structuredContent` | Not started |
 | 2.8 | JSON-RPC errors `-32601`, `-32602`, `-32001`, `-32603`; REST `POST /tools/list`, `POST /tools/call` with `NOT_FOUND`, `INVALID_ARGUMENT`, `INTERNAL` | Not started |
 | 2.9 | Local smoke: `python -m uvicorn conferenceCatalogMCP.server:app --host 127.0.0.1 --port 8010`; verify initialize, tools/list, `match_sessions` with signal `agent observability` limit 3; confirm codes via events-cli | Not started |
@@ -194,4 +194,4 @@ Also required in project documentation (not product integrations): market compar
 
 ## Next action
 
-Continue Phase 2 at **2.4** (scoring formula), then 2.5–2.9.
+Continue Phase 2 at **2.7** (FastAPI MCP JSON-RPC), then 2.8–2.9.
